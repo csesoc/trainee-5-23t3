@@ -1,4 +1,5 @@
-# trainee-5-23t3
+# ⚡Team Plasma⚡
+![Picture2](https://github.com/csesoc/trainee-5-23t3/assets/54874111/5ae81946-bd0e-4432-90a5-461c1e2b11eb)
 
 ## Frontend
 
