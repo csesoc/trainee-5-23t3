@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String  	@id @default(cuid()) @map("_id") @db.ObjectId
+  email       String   	@unique
+  name        String
+  password    String
+  role        Role     	@default(USER)
+	sessions	  Session[] @relation(fields: [sessionIDs], references: [id])
+  sessionIDs  String[]  @db.ObjectId
+
+  // two "sides" of the relationship:(
+  friends             User[]   @relation("UserFollows", fields: [friendIDs], references: [id])
+  friendIDs           String[] @db.ObjectId
+  // This second "side" of the UserFriends relation exists solely 
+  // to satisfy prisma's requirements; we won't access it directly.
+  symmetricFriends    User[]   @relation("UserFollows", fields: [symFriendIDs], references: [id])
+  symFriendIDs        String[] @db.ObjectId
+
+  sessionData SessionInfo[]
+  shots       Shot[]
+}
+
+model Session {
+	id				      String        @id @default(cuid()) @map("_id") @db.ObjectId
+  name            String?
+	createdAt	      DateTime      @default(now())
+  updatedAt	      DateTime      @updatedAt
+	endedAt  	      DateTime?
+	participants	  User[]        @relation(fields: [participantIDs], references: [id])
+  participantIDs  String[]      @db.ObjectId
+  sessionInfo     SessionInfo[]
+}
+
+// relation between a session and one of its participants - joint time and list of shots
+model SessionInfo {
+  id            String    @id @default(cuid()) @map("_id") @db.ObjectId
+  participant   User      @relation(fields: [participantID], references: [id])
+  participantID String    @db.ObjectId
+  session       Session   @relation(fields: [sessionId], references: [id])
+  sessionId     String    @db.ObjectId
+  jointAt       DateTime  @default(now())
+  drinks        Shot[]
+}
+
+// Info of a shot
+model Shot {
+  id      String        @id @default(cuid()) @map("_id") @db.ObjectId
+  user    User          @relation(fields: [userID], references: [id])
+  userID  String        @db.ObjectId
+  session	  SessionInfo @relation(fields: [sessionID], references: [id])
+  sessionID  String     @db.ObjectId
+  drink   String        // alcohol name
+  dRate   Int           // doomed rate? IDK the right name for this...Calculated by backend
+                        // from alcoholPct & shot size?
+}
+
+// db for different types of alcohols - user can select from/add new alcohols to db while recording shots
+model Alcohol {
+	id          String  @id @default(cuid()) @map("_id") @db.ObjectId
+	name        String  @unique
+  alcoholPct  Float   // in %
+  size        Int?    // size of the liquor in mL
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+
