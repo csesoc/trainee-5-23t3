@@ -35,3 +35,19 @@ Inside main.tsx we wrap all initialise the React component, Mantine Provider (St
 
 We've provided an example where pages can be rendered as parts of the appshell in the root page (with navbar etc.) or rendered seperately.
 
+## Backend
+
+## Setting up the backend
+Open a terminal in the backend folder. Then install all npm packages with npm i. If starting from the outermost directory this will look like
+```
+cd backend
+npm i
+```
+To run the backend, run the following command in the backend folder
+```
+npm start
+```
+
+### Relevant documentation for the Backend
+Here is all the information related to prisma and mongodb
+https://www.prisma.io/dataguide#mongodb
