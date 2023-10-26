@@ -34,7 +34,7 @@ const errorHandler = (fn: (req: Request, res: Response, next: NextFunction) => P
 
 // Route Handlers Here
 app.get('/', (req, res) => {
-    res.json('Hello World');
+    res.json('New Hello World!');
 });
 
 app.post(
