@@ -8,6 +8,7 @@ import {
 import ErrorPage from './routes/ErrorPage';
 import ExamplePage from './routes/ExamplePage';
 import HomePage from './routes/HomePage';
+import EchoPage from './routes/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
 
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "example",
         element: <ExamplePage/>
+      },
+      {
+        path: "echo",
+        element: <EchoPage/>
       }
     ]
   },
