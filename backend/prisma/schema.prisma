@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id          String  	@id @default(cuid()) @map("_id") @db.ObjectId
+  id          String  	@id @default(auto()) @map("_id") @db.ObjectId
   email       String   	@unique
   name        String
   password    String
@@ -32,7 +32,7 @@ model User {
 }
 
 model Session {
-	id				      String        @id @default(cuid()) @map("_id") @db.ObjectId
+	id				      String        @id @default(auto()) @map("_id") @db.ObjectId
   name            String?
 	createdAt	      DateTime      @default(now())
   updatedAt	      DateTime      @updatedAt
@@ -44,7 +44,7 @@ model Session {
 
 // relation between a session and one of its participants - joint time and list of shots
 model SessionInfo {
-  id            String    @id @default(cuid()) @map("_id") @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   participant   User      @relation(fields: [participantID], references: [id])
   participantID String    @db.ObjectId
   session       Session   @relation(fields: [sessionId], references: [id])
@@ -55,7 +55,7 @@ model SessionInfo {
 
 // Info of a shot
 model Shot {
-  id      String        @id @default(cuid()) @map("_id") @db.ObjectId
+  id      String        @id @default(auto()) @map("_id") @db.ObjectId
   user    User          @relation(fields: [userID], references: [id])
   userID  String        @db.ObjectId
   session	  SessionInfo @relation(fields: [sessionID], references: [id])
@@ -67,7 +67,7 @@ model Shot {
 
 // db for different types of alcohols - user can select from/add new alcohols to db while recording shots
 model Alcohol {
-	id          String  @id @default(cuid()) @map("_id") @db.ObjectId
+	id          String  @id @default(auto()) @map("_id") @db.ObjectId
 	name        String  @unique
   alcoholPct  Float   // in %
   size        Int?    // size of the liquor in mL
@@ -78,4 +78,7 @@ enum Role {
   USER
 }
 
-
+model Echo {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  echoString String  @unique
+}

@@ -13,13 +13,26 @@ const prisma = new PrismaClient();
 /*                               Functions                                    */
 /* -------------------------------------------------------------------------- */
 
-// Example Function
+// Example Echo Function for adding to db
 const echoFunction = async(startup: string) => {
     if (startup === '') {
         throw new InputError('startup can not be empty');
     }
 
-    return { echo: 'i am an echo' };
+    await prisma.echo.create({
+        data: {
+            echoString: startup
+        }
+    }) 
+
+    return { echo: 'Success!' };
 }
 
-export { echoFunction };
+// Example Echo Function for retrieving from db
+const echoRetrieveFunction = async() => {
+    const allEcho = await prisma.echo.findMany()
+    console.log(allEcho);
+    return allEcho;
+}
+
+export { echoFunction, echoRetrieveFunction };

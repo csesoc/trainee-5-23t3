@@ -2,7 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { InputError, AccessError } from './error';
 import {
-  echoFunction
+  echoFunction,
+  echoRetrieveFunction
 } from './service'
 
 const PORT = 6969;
@@ -46,6 +47,13 @@ app.post(
   }),
 );
 
+app.get(
+  '/echo',
+  errorHandler(async (req, res) => {
+    const response = await echoRetrieveFunction();
+    res.json(response);
+  }),
+);
 
 // Default route for unmatched routes
 app.use((req, res) => {
