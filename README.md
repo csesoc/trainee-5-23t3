@@ -47,6 +47,10 @@ To run the backend, run the following command in the backend folder
 ```
 npm start
 ```
+You will also need to be connected to the database via mongoDBCompass
+
+## Example Function
+I have set up a post and get function for echoing so you can get an idea of how to access the database on the backend. I have also written up an echo page so you can see how the backend and frontend interact.
 
 ### Relevant documentation for the Backend
 Here is all the information related to prisma and mongodb
