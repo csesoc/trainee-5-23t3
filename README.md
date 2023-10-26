@@ -47,7 +47,21 @@ To run the backend, run the following command in the backend folder
 ```
 npm start
 ```
+You will also need to be connected to the database via mongoDBCompass
 
+## Example Function
+I have set up a post and get function for echoing so you can get an idea of how to access the database on the backend. I have also written up an echo page so you can see how the backend and frontend interact.
+
+## Prisma Schema File
+Any changes made to the prisma schema file have to be pushed to mongoDB. Once a change is made, run the following commands
+```
+npx prisma generate
+npx prisma db push
+```
+If this doesn't work, run the following command and try again
+```
+npm install @prisma/client
+```
 ### Relevant documentation for the Backend
 Here is all the information related to prisma and mongodb
 https://www.prisma.io/dataguide#mongodb
