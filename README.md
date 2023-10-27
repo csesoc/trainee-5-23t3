@@ -3,6 +3,9 @@
 
 ## Frontend
 
+### Prototype
+Figma design link [Click to go to design prototype](https://www.figma.com/file/80ivMhy3jkOXciToLXj3ZF/Drinking-Limit-Figma)
+
 ### Setting up the frontend
 Open a terminal in the src folder at client/limit-frontend/src. Then install all npm packages with npm i. If starting from the outermost directory this will look like
 ```
@@ -42,12 +45,22 @@ Open a terminal in the backend folder. Then install all npm packages with npm i.
 ```
 cd backend
 npm i
+npx prisma generate
 ```
 To run the backend, run the following command in the backend folder
 ```
-npm start
+npm run dev
 ```
-You will also need to be connected to the database via mongoDBCompass
+
+### Env File
+Inside the same directory
+```
+touch .env
+```
+Add the following line
+```
+DATABASE_URL="[Insert database URL here]"
+```
 
 ## Example Function
 I have set up a post and get function for echoing so you can get an idea of how to access the database on the backend. I have also written up an echo page so you can see how the backend and frontend interact.
