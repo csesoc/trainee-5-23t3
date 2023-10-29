@@ -11,6 +11,7 @@ import HomePage from './routes/HomePage';
 import EchoPage from './routes/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
+import LeaderBoardPage from './routes/LeaderboardPage';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "echo",
         element: <EchoPage/>
+      },
+      {
+        path: "leaderboard",
+        element: <LeaderBoardPage/>
       }
     ]
   },

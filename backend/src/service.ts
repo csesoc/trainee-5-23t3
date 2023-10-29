@@ -35,4 +35,28 @@ const echoRetrieveFunction = async() => {
     return allEcho;
 }
 
-export { echoFunction, echoRetrieveFunction };
+const joinSessionFunction = async(userID: string, sessionID: string) => {
+    await prisma.session.update({
+        where: {
+            id: sessionID
+        },
+        data: {
+            participantIDs: {
+                push: userID
+            }
+        }
+    })
+}
+
+const leaderboardData = async(sessionID: string) => {
+    const session = await prisma.session.findFirstOrThrow({
+        where: {
+            id: sessionID
+        },
+        include: {
+            participants: true
+        }
+    })
+}
+
+export {joinSessionFunction, echoFunction, echoRetrieveFunction };
