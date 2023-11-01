@@ -12,6 +12,8 @@ import EchoPage from './routes/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
 import LeaderBoardPage from './routes/LeaderboardPage';
+import StartSessionTestPage from './routes/StartSessionTest';
+import NewSessionPage from './routes/NewSessionPage';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,13 @@ const router = createBrowserRouter([
       {
         path: "leaderboard",
         element: <LeaderBoardPage/>
+      }, 
+      {
+        path: "start",
+        element: <StartSessionTestPage/>
+      }, {
+        path: "new_session/:session",
+        element: <NewSessionPage/>
       }
     ]
   },
