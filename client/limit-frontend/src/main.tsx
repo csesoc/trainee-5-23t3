@@ -11,6 +11,8 @@ import HomePage from './routes/HomePage';
 import EchoPage from './routes/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
+import TestPage from './routes/TestPage';
+import StartSessionButton from './components/CreateSessionButton';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: "echo",
         element: <EchoPage/>
+      },
+      {
+        path:"join/:session",
+        element: <TestPage/>
+      },
+      {
+        path: "start",
+        element: <StartSessionButton/>
       }
     ]
   },
@@ -39,9 +49,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <MantineProvider theme={theme}>
       <RouterProvider router={router} />
     </MantineProvider>
-  </React.StrictMode>,
+  // </React.StrictMode>,
 )
