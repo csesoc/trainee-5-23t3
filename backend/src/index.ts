@@ -53,45 +53,51 @@ app.get('/', (req, res) => {
 /* -------------------------------------------------------------------------- */
 
 const fakeDB: any = {}
-const waiting_sessions: {[live_id: string]: string} = {}
+const live_sessions: {[live_id: string]: string} = {}
 
-const waitNamespace = io.of('/session')
+const waitNamespace = io.of('/wait')
+
+const getWaitRoom = (session:string) => {
+  return "wait" + session;
+}
 
 waitNamespace.on('connection', (socket) => {
 
   const user = socket.handshake.query.user
   const session: string = socket.handshake.query.session as string;
+  const room = getWaitRoom(session)
   console.log(session)
 
-  const emitData = () => {
-    waitNamespace.to(session).emit('data', fakeDB[session].users)
+  const emitWaitData = () => {
+    waitNamespace.to(room).emit('data', fakeDB[session].users)
   }
 
-  if (!(session in waiting_sessions)) {
+  if (!(session in live_sessions)) {
     console.log("Bad Session")
     socket.disconnect()
   } else {
-    socket.join(session);
+    socket.join(room);
 
-    waitNamespace.to(session).emit("message", `Welcome user${user} to the session ${session}`)
+    waitNamespace.to(room).emit("message", `Welcome user${user} to the session ${session}`)
   
     // Add user account to session
     console.log("Fake Db",fakeDB[session])
     fakeDB[session].users.push(user)
   
     // Emit all name data
-    emitData()
-  
-    socket.on('disconnect', () => {
-      // Remove user from session in db
-      fakeDB[session].users = fakeDB[session].users.filter((u: any) => u !== user)
-  
-      console.log('user disconnected');
-      waitNamespace.to(session).emit('message', 'A user has left the chat')
-      // Emit all name data
-      emitData()
-    });
+    emitWaitData()
   }
+
+  socket.on('disconnect', () => {
+    // Remove user from session in db
+    fakeDB[session].users = fakeDB[session].users.filter((u: any) => u !== user)
+
+    console.log('user disconnected');
+    waitNamespace.to(session).emit('message', 'A user has left the chat')
+    // Emit all name data
+    emitWaitData()
+  });
+  
 });
 
 app.post(
@@ -99,11 +105,12 @@ app.post(
   errorHandler(async(req, res) => {
     // const response = await createSessionFunction(userID)
     let new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
-    while (new_session_id in waiting_sessions) {
+    while (new_session_id in live_sessions) {
       new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
     }
     // Create the database and store the mapping 
-    waiting_sessions[new_session_id] = new_session_id;
+    // TODO change right side for database id
+    live_sessions[new_session_id] = new_session_id;
     fakeDB[new_session_id] = {users: []}
 
     res.json({id: new_session_id})
@@ -114,8 +121,9 @@ app.post(
   '/start_session',
   errorHandler(async(req, res) => {
     const { user, session } = req.body
+    const room = getWaitRoom(session)
     // Verify that the given id is from the room owner
-    if (!(session in waiting_sessions)) {
+    if (!(session in live_sessions)) {
       throw new InputError("Unknown session name")
     }
 
@@ -123,18 +131,53 @@ app.post(
       throw new AccessError("Only the owner of the session can start the session")
     }
 
+    // Indicate that clients should change to new connection 
+    waitNamespace.to(room).emit("start-session")
+    delete live_sessions[session]
+
     // Close all connections related to the room
-    waitNamespace.to(session).emit("start-session")
-    delete waiting_sessions[session]
-    // waitNamespace.in(session).disconnectSockets()
+    waitNamespace.in(room).disconnectSockets()
 
     res.json({success: true})
   })
 )
 
 /* -------------------------------------------------------------------------- */
-/*                          Waiting Sessions                                  */
+/*                             Live Sessions                                  */
 /* -------------------------------------------------------------------------- */
+
+const leaderboardNamespace = io.of('/leaderboard')
+
+const getLeaderboardRoom = (session:string) => {
+  return "leaderboard" + session;
+}
+
+leaderboardNamespace.on('connection', (socket) => {
+
+  const user = socket.handshake.query.user
+  const session: string = socket.handshake.query.session as string;
+  const room = getLeaderboardRoom(session)
+
+  const emitLeaderboardData = () => {
+    leaderboardNamespace.to(room).emit('data', fakeDB[session].users)
+  }
+
+  // Close the connection if there is no matching session in the database
+  // Close the connection if the user is not in the list of users
+
+  if (!(session in live_sessions)) {
+    console.log("Bad Session")
+    socket.disconnect()
+  } else {
+    socket.join(room);
+    emitLeaderboardData();
+  }
+
+  socket.on('disconnect', () => {
+    leaderboardNamespace.to(room).emit('message', 'A user has left the chat')
+    emitLeaderboardData();
+  });
+});
 
 app.post(
   '/echo',

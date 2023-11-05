@@ -13,7 +13,7 @@ export default function TestPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   useEffect(() => {
-    const socket = io("http://localhost:6969/session", {
+    const socket = io("http://localhost:6969/wait", {
       query: {
       "user": userId,
       "session": session
