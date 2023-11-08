@@ -6,13 +6,14 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ErrorPage from './routes/ErrorPage';
-import ExamplePage from './routes/ExamplePage';
+import ExamplePage from './routes/examples/ExamplePage';
 import HomePage from './routes/HomePage';
-import EchoPage from './routes/EchoPage';
+import EchoPage from './routes/examples/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
-import TestPage from './routes/TestPage';
+import JoinedSessionPage from './routes/JoinedSessionPage';
 import StartSessionButton from './components/CreateSessionButton';
+import LiveSessionController from './routes/LiveSessionController';
 
 const router = createBrowserRouter([
   {
@@ -34,12 +35,16 @@ const router = createBrowserRouter([
       },
       {
         path:"join/:session",
-        element: <TestPage/>
+        element: <JoinedSessionPage/>
       },
       {
-        path: "start",
+        path: "create",
         element: <StartSessionButton/>
-      }
+      }, 
+      {
+        path: "live/:session",
+        element: <LiveSessionController/>,
+      },
     ]
   },
   {

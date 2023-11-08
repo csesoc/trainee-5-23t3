@@ -52,8 +52,13 @@ app.get('/', (req, res) => {
 /*                          Waiting Sessions                                  */
 /* -------------------------------------------------------------------------- */
 
+type LiveMapping = {
+  dbId: string,
+  live: boolean
+}
+
 const fakeDB: any = {}
-const live_sessions: {[live_id: string]: string} = {}
+const live_sessions: {[live_id: string]: LiveMapping} = {}
 
 const waitNamespace = io.of('/wait')
 
@@ -90,7 +95,10 @@ waitNamespace.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     // Remove user from session in db
-    fakeDB[session].users = fakeDB[session].users.filter((u: any) => u !== user)
+    if (live_sessions[session].live === false) {
+      
+      fakeDB[session].users = fakeDB[session].users.filter((u: any) => u !== user)
+    }
 
     console.log('user disconnected');
     waitNamespace.to(session).emit('message', 'A user has left the chat')
@@ -110,7 +118,10 @@ app.post(
     }
     // Create the database and store the mapping 
     // TODO change right side for database id
-    live_sessions[new_session_id] = new_session_id;
+    live_sessions[new_session_id] = {
+      dbId: new_session_id,
+      live: false
+    };
     fakeDB[new_session_id] = {users: []}
 
     res.json({id: new_session_id})
@@ -131,9 +142,11 @@ app.post(
       throw new AccessError("Only the owner of the session can start the session")
     }
 
+    live_sessions[session].live = true;
+
     // Indicate that clients should change to new connection 
     waitNamespace.to(room).emit("start-session")
-    delete live_sessions[session]
+    //delete live_sessions[session]
 
     // Close all connections related to the room
     waitNamespace.in(room).disconnectSockets()
@@ -142,24 +155,26 @@ app.post(
   })
 )
 
+
+
 /* -------------------------------------------------------------------------- */
 /*                             Live Sessions                                  */
 /* -------------------------------------------------------------------------- */
 
-const leaderboardNamespace = io.of('/leaderboard')
+const liveNamespace = io.of('/live')
 
-const getLeaderboardRoom = (session:string) => {
-  return "leaderboard" + session;
+const getLiveRoom = (session:string) => {
+  return "live" + session;
 }
 
-leaderboardNamespace.on('connection', (socket) => {
+liveNamespace.on('connection', (socket) => {
 
   const user = socket.handshake.query.user
   const session: string = socket.handshake.query.session as string;
-  const room = getLeaderboardRoom(session)
+  const room = getLiveRoom(session)
 
   const emitLeaderboardData = () => {
-    leaderboardNamespace.to(room).emit('data', fakeDB[session].users)
+    liveNamespace.to(room).emit('data', fakeDB[session].users)
   }
 
   // Close the connection if there is no matching session in the database
@@ -174,10 +189,36 @@ leaderboardNamespace.on('connection', (socket) => {
   }
 
   socket.on('disconnect', () => {
-    leaderboardNamespace.to(room).emit('message', 'A user has left the chat')
+    liveNamespace.to(room).emit('message', 'A user has left the chat')
     emitLeaderboardData();
   });
 });
+
+app.post(
+  '/end_session',
+  errorHandler(async(req, res) => {
+    const { user, session } = req.body
+    const waitRoom = getWaitRoom(session);
+    const liveRoom = getLiveRoom(session);
+    // Verify that the given id is from the room owner
+    if (!(session in live_sessions)) {
+      throw new InputError("Unknown session name")
+    }
+
+    if (fakeDB[session].users[0] !== user) {
+      throw new AccessError("Only the owner of the session can end the session")
+    }
+
+    // Indicate that clients should change to new connection 
+    waitNamespace.to(liveRoom).emit("end-session")
+    //delete live_sessions[session]
+
+    // Close all connections related to the room
+    waitNamespace.in(liveRoom).disconnectSockets()
+
+    res.json({success: true})
+  })
+)
 
 app.post(
   '/echo',

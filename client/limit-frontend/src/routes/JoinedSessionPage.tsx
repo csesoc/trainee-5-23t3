@@ -1,13 +1,12 @@
-import { Button, TextInput } from "@mantine/core";
-import { ChangeEvent, useEffect, useState } from "react";
-import { Navigate, redirect, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import StartSessionButton from "../components/StartSessionButton";
 
 
 const userId = Math.floor(Math.random()*1000).toString()
 
-export default function TestPage() {
+export default function JoinedSessionPage() {
   let { session } = useParams();
   session = session as string; 
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ export default function TestPage() {
 
     function onStartSession() {
       socket.disconnect()
-      navigate('/example')
+      navigate(`/live/${session}`)
     }
 
     function onDisconnect() {
