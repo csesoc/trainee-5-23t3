@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function ExamplePage() {
     const [ text, setText ] = useState('')
+    console.log(text);
     useEffect(() => {
           fetch(`http://localhost:6969/`)
           .then(resp => resp.json())

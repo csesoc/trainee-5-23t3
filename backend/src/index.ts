@@ -3,7 +3,9 @@ import cors from 'cors';
 import { InputError, AccessError } from './error';
 import {
   echoFunction,
-  echoRetrieveFunction
+  echoRetrieveFunction,
+  login,
+  register,
 } from './service'
 
 const PORT = 6969;
@@ -52,6 +54,24 @@ app.get(
   errorHandler(async (req, res) => {
     const response = await echoRetrieveFunction();
     res.json(response);
+  }),
+);
+
+app.post(
+  '/auth/login',
+  errorHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const token = await login(email, password);
+    res.json(token);
+  }),
+);
+
+app.post(
+  '/auth/register',
+  errorHandler(async (req, res) => {
+    const { email, password, name } = req.body;
+    const token = await register(email, password, name);
+    res.json(token);
   }),
 );
 

@@ -9,8 +9,10 @@ import ErrorPage from './routes/ErrorPage';
 import ExamplePage from './routes/ExamplePage';
 import HomePage from './routes/HomePage';
 import EchoPage from './routes/EchoPage';
+import RegisterPage from './routes/RegisterPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
+import LoginPage from './routes/LoginPage';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: "echo",
         element: <EchoPage/>
+      },
+      {
+        path: "register",
+        element: <RegisterPage />
+      },
+      {
+        path: "login",
+        element: <LoginPage />
       }
     ]
   },
