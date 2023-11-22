@@ -12,7 +12,6 @@ export default function Root() {
   // Get token in local storage
   React.useEffect(() => {
     const localToken = localStorage.getItem('token');
-    console.log('triggered!');
     if (localToken !== token) {
       setToken(localToken);
     }

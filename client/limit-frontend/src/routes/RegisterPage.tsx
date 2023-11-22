@@ -30,8 +30,6 @@ export default function RegisterPage() {
       alert('Passwords do not match');
       throw new Error('Passwords do not match');
     } else {
-      console.log('in');
-      console.log(name, email, password, confirmPassword);
       const res = await fetch('http://localhost:6969/auth/register', {
         method: 'POST',
         body: JSON.stringify({
@@ -44,10 +42,8 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (data.error) {
-        console.log('Error...');
         alert(data.error);
       } else if (data.token) {
-        console.log('New token is: ' + data.token);
         localStorage.setItem('token', data.token);
         navigate('/');
       }
@@ -68,7 +64,7 @@ export default function RegisterPage() {
         {...form.getInputProps('password')}
       />
       <PasswordInput
-        mt="md"
+      
         label="Confirm password"
         placeholder="Confirm password"
         visible={visible}
