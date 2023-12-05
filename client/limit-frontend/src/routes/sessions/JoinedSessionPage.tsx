@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import StartSessionButton from "../../components/StartSessionButton";
+import { Button, Container, Flex, Paper, TextInput } from "@mantine/core";
 
 
 const userId = Math.floor(Math.random()*1000).toString()
@@ -60,12 +61,26 @@ export default function JoinedSessionPage() {
   })
 
   return (
-    <>
+    <Container> 
       <h2>Hello {userId} on {session}</h2>
-      <div>
-        {userList}
-      </div>
+      <Paper withBorder style={{padding: '20px'}}>
+        <Flex direction="column" align="center">
+          <h1>
+          SHARE THIS CODE WITH FRIENDS
+          </h1>
+          <h1>
+            {session}
+          </h1>
+      </Flex>
+      </Paper>
+        <h1>
+          Players 
+        </h1>
+        <div>
+          {userList}
+        </div>
       <StartSessionButton user={userId} session={session}/>
-    </>
+     </Container>
+    
   );
 }
