@@ -11,9 +11,10 @@ import HomePage from './routes/HomePage';
 import EchoPage from './routes/examples/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
-import JoinedSessionPage from './routes/JoinedSessionPage';
+import JoinedSessionPage from './routes/sessions/JoinedSessionPage';
 import StartSessionButton from './components/CreateSessionButton';
-import LiveSessionController from './routes/LiveSessionController';
+import LiveSessionController from './routes/sessions/LiveSessionController';
+import JoinSessionPage from './routes/sessions/JoinSessionPage';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "echo",
         element: <EchoPage/>
+      },
+      {
+        path: "join",
+        element: <JoinSessionPage/>
       },
       {
         path:"join/:session",

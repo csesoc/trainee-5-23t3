@@ -1,8 +1,8 @@
 import { ContextType, createContext, useEffect, useState } from "react";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
-import LeaderboardPage from "../components/liveSession/LeaderboardPage";
-import SelfSessionPage from "../components/liveSession/SelfSessionPage";
+import LeaderboardPage from "../../components/liveSession/LeaderboardPage";
+import SelfSessionPage from "../../components/liveSession/SelfSessionPage";
 import { Button } from "@mantine/core";
 
 const userId = Math.floor(Math.random()*1000).toString()
@@ -17,6 +17,7 @@ export default function LiveSessionController() {
   const navigate = useNavigate();
 
   const [activePage, setActivePage] = useState<ActivePageType>("self")
+  const [userData, setUserData] = useState([])
 
   const handleClick = () => {
     if (activePage == "self") {
@@ -44,7 +45,7 @@ export default function LiveSessionController() {
     }
 
     function onData(data: any) {
-      setUsers(data)
+      setUserData(data)
       console.log(data)
     }
 

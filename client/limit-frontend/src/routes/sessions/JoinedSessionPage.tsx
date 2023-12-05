@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
-import StartSessionButton from "../components/StartSessionButton";
+import StartSessionButton from "../../components/StartSessionButton";
 
 
 const userId = Math.floor(Math.random()*1000).toString()
