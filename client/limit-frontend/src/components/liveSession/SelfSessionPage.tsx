@@ -6,7 +6,7 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
         <h3>
             Self Session Page
         </h3>
-        <Button onClick={() => props.emitData("Hello Data2")}>Hello World</Button>
+        <Button onClick={() => props.emitData("Hello Data")}>Hello World</Button>
     </>
   );
 }

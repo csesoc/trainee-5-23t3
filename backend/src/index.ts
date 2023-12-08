@@ -189,6 +189,7 @@ liveNamespace.on('connection', (socket) => {
   }
 
   socket.on('data', (data:any) => {
+    // Assume that any data recieved on data will be adding a drink
     console.log(data)
   })
 
