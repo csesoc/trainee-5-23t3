@@ -1,0 +1,7 @@
+.progress {
+    background-color: #FF5E3B;
+    border-collapse: collapse;
+    border: 0.9em solid #FF5E3B;
+    height: 4rem;
+    border-radius: 2rem;
+}

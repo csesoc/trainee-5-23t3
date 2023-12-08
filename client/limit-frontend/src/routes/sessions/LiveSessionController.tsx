@@ -17,7 +17,8 @@ export default function LiveSessionController() {
   const navigate = useNavigate();
 
   const [activePage, setActivePage] = useState<ActivePageType>("self")
-  const [userData, setUserData] = useState([])
+  const [userData, setUserData] = useState([10,20,30])
+  const [funct, setFunct] = useState<Function>(() => (data: any) => console.log(data))
 
   const handleClick = () => {
     if (activePage == "self") {
@@ -35,6 +36,8 @@ export default function LiveSessionController() {
       "session": session
       }
     })
+
+    
 
     function onConnect() {
       console.log("connected")
@@ -58,6 +61,12 @@ export default function LiveSessionController() {
       navigate('/')
     }
 
+    const emitData = (data: any) => {
+      socket.emit('data', data)
+    }
+
+    setFunct(() => emitData)
+
     socket.on('connect', onConnect)
     socket.on('message', onMessage)
     socket.on('data', onData)
@@ -76,8 +85,8 @@ export default function LiveSessionController() {
   return (
     <>
     {
-      activePage == "self" ? <SelfSessionPage userData={users}/> :
-      activePage == "leaderboard" ? <LeaderboardPage userDataList={users}/> :
+      activePage == "self" ? <SelfSessionPage userData={userData} emitData={funct}/> :
+      activePage == "leaderboard" ? <LeaderboardPage userDataList={userData}/> :
       undefined
     }
       <Button variant="filled" onClick={handleClick}>

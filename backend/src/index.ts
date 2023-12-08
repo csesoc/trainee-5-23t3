@@ -188,6 +188,10 @@ liveNamespace.on('connection', (socket) => {
     emitLeaderboardData();
   }
 
+  socket.on('data', (data:any) => {
+    console.log(data)
+  })
+
   socket.on('disconnect', () => {
     liveNamespace.to(room).emit('message', 'A user has left the chat')
     emitLeaderboardData();
