@@ -27,7 +27,7 @@ export default function Root() {
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShell.Header display={'flex'}>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <div>Logo</div>
 
@@ -35,24 +35,17 @@ export default function Root() {
           <>
             <Button 
               variant="gradient" 
-              gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+              gradient={{ from: 'red', to: 'orange', deg: 90 }}
               onClick={logout}>
               Logout
             </Button>
           </>
           ) : (
             <>
-              <Link to="/register">
-                <Button
-                  variant="gradient" 
-                  gradient={{ from: 'blue', to: 'cyan', deg: 90 }}>
-                    Register
-                </Button>
-              </Link>
               <Link to="/Login">
                 <Button
                   variant="gradient" 
-                  gradient={{ from: 'blue', to: 'cyan', deg: 90 }}>
+                  gradient={{ from: 'red', to: 'orange', deg: 90 }}>
                     Login
                 </Button>
               </Link>

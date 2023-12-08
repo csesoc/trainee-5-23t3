@@ -10,7 +10,7 @@ export default function RegisterPage() {
 
   React.useEffect(() => {
     if (localStorage.getItem('token')) {
-      navigate('/');
+      navigate(-2);
     }
   }, [])
 
@@ -45,7 +45,7 @@ export default function RegisterPage() {
         alert(data.error);
       } else if (data.token) {
         localStorage.setItem('token', data.token);
-        navigate('/');
+        navigate(-2);
       }
     }
   }
@@ -80,7 +80,7 @@ export default function RegisterPage() {
         </Button>
         <Button
           variant="contained"
-          onClick={() => navigate('/')}>
+          onClick={() => navigate(-2)}>
           Cancel
         </Button>
       </Group>
