@@ -196,7 +196,8 @@ liveNamespace.on('connection', (socket) => {
   const room = getLiveRoom(session)
 
   const emitLeaderboardData = () => {
-    liveNamespace.to(room).emit('data', fakeDB[session].users)
+    // retrive session data from db
+    // liveNamespace.to(room).emit('data', some data structure)
   }
 
   // Close the connection if there is no matching session in the database
