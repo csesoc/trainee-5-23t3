@@ -1,5 +1,5 @@
 import "@mantine/core/styles.css";
-import { AppShell, Burger, Button } from "@mantine/core";
+import { AppShell, Burger, Button, Flex } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
@@ -27,31 +27,33 @@ export default function Root() {
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Header display={'flex'}>
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        <div>Logo</div>
+      <AppShell.Header>
+        <Flex mih={60} mx="lg" justify="space-between" align="center">
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <div>Logo</div>
 
-        { token ? (
-          <>
-            <Button 
-              variant="gradient" 
-              gradient={{ from: 'red', to: 'orange', deg: 90 }}
-              onClick={logout}>
-              Logout
-            </Button>
-          </>
-          ) : (
+          { token ? (
             <>
-              <Link to="/Login">
-                <Button
-                  variant="gradient" 
-                  gradient={{ from: 'red', to: 'orange', deg: 90 }}>
-                    Login
-                </Button>
-              </Link>
+              <Button 
+                variant="gradient" 
+                gradient={{ from: 'red', to: 'orange', deg: 90 }}
+                onClick={logout}>
+                Logout
+              </Button>
             </>
-          )
-        }
+            ) : (
+              <>
+                <Link to="/Login">
+                  <Button
+                    variant="gradient" 
+                    gradient={{ from: 'red', to: 'orange', deg: 90 }}>
+                      Login
+                  </Button>
+                </Link>
+              </>
+            )
+          }
+        </Flex>
       </AppShell.Header>
 
       <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
