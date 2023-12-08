@@ -1,11 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
+import { Server } from 'socket.io';
 import cors from 'cors';
 import { InputError, AccessError } from './error';
 import {
   echoFunction,
-  echoRetrieveFunction
+  echoRetrieveFunction,
+  login,
+  register
 } from './service'
-import { error } from 'console';
+import { createServer } from 'http';
 
 const PORT = 6969;
 
@@ -16,6 +19,13 @@ app.use(cors({
   },
   credentials: true
 }));
+
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
 app.use(express.json());
 
 const errorHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) => 
@@ -36,17 +46,201 @@ const errorHandler = (fn: (req: Request, res: Response, next: NextFunction) => P
 
 // Route Handlers Here
 app.get('/', (req, res) => {
-    res.json('New Hello World!');
+    res.json('Hello World!');
 });
 
-// Router to obtain the drinks upon adding
+/* -------------------------------------------------------------------------- */
+/*                               Auth                                         */
+/* -------------------------------------------------------------------------- */
 app.post(
-  '/modal', 
+  '/auth/login',
   errorHandler(async (req, res) => {
-    const { user } = req.body;
-    
+    const { email, password } = req.body;
+    const token = await login(email, password);
+    res.json(token);
   }),
 );
+
+app.post(
+  '/auth/register',
+  errorHandler(async (req, res) => {
+    const { email, password, name } = req.body;
+    const token = await register(email, password, name);
+    res.json(token);
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
+/*                          Waiting Sessions                                  */
+/* -------------------------------------------------------------------------- */
+
+type LiveMapping = {
+  dbId: string,
+  live: boolean
+}
+
+const fakeDB: any = {}
+const live_sessions: {[live_id: string]: LiveMapping} = {}
+
+const waitNamespace = io.of('/wait')
+
+const getWaitRoom = (session:string) => {
+  return "wait" + session;
+}
+
+waitNamespace.on('connection', (socket) => {
+
+  const user = socket.handshake.query.user
+  const session: string = socket.handshake.query.session as string;
+  const room = getWaitRoom(session)
+  console.log(session)
+
+  const emitWaitData = () => {
+    waitNamespace.to(room).emit('data', fakeDB[session].users)
+  }
+
+  if (!(session in live_sessions)) {
+    console.log("Bad Session")
+    socket.disconnect()
+  } else {
+    socket.join(room);
+
+    waitNamespace.to(room).emit("message", `Welcome user${user} to the session ${session}`)
+  
+    // Add user account to session
+    console.log("Fake Db",fakeDB[session])
+    fakeDB[session].users.push(user)
+  
+    // Emit all name data
+    emitWaitData()
+  }
+
+  socket.on('disconnect', () => {
+    // Remove user from session in db
+    if (live_sessions[session].live === false) {
+      
+      fakeDB[session].users = fakeDB[session].users.filter((u: any) => u !== user)
+    }
+
+    console.log('user disconnected');
+    waitNamespace.to(session).emit('message', 'A user has left the chat')
+    // Emit all name data
+    emitWaitData()
+  });
+  
+});
+
+app.post(
+  '/create_session',
+  errorHandler(async(req, res) => {
+    // const response = await createSessionFunction(userID)
+    let new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
+    while (new_session_id in live_sessions) {
+      new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
+    }
+    // Create the database and store the mapping 
+    // TODO change right side for database id
+    live_sessions[new_session_id] = {
+      dbId: new_session_id,
+      live: false
+    };
+    fakeDB[new_session_id] = {users: []}
+
+    res.json({id: new_session_id})
+  })
+)
+
+app.post(
+  '/start_session',
+  errorHandler(async(req, res) => {
+    const { user, session } = req.body
+    const room = getWaitRoom(session)
+    // Verify that the given id is from the room owner
+    if (!(session in live_sessions)) {
+      throw new InputError("Unknown session name")
+    }
+
+    if (fakeDB[session].users[0] !== user) {
+      throw new AccessError("Only the owner of the session can start the session")
+    }
+
+    live_sessions[session].live = true;
+
+    // Indicate that clients should change to new connection 
+    waitNamespace.to(room).emit("start-session")
+    //delete live_sessions[session]
+
+    // Close all connections related to the room
+    waitNamespace.in(room).disconnectSockets()
+
+    res.json({success: true})
+  })
+)
+
+
+
+/* -------------------------------------------------------------------------- */
+/*                             Live Sessions                                  */
+/* -------------------------------------------------------------------------- */
+
+const liveNamespace = io.of('/live')
+
+const getLiveRoom = (session:string) => {
+  return "live" + session;
+}
+
+liveNamespace.on('connection', (socket) => {
+
+  const user = socket.handshake.query.user
+  const session: string = socket.handshake.query.session as string;
+  const room = getLiveRoom(session)
+
+  const emitLeaderboardData = () => {
+    liveNamespace.to(room).emit('data', fakeDB[session].users)
+  }
+
+  // Close the connection if there is no matching session in the database
+  // Close the connection if the user is not in the list of users
+
+  if (!(session in live_sessions)) {
+    console.log("Bad Session")
+    socket.disconnect()
+  } else {
+    socket.join(room);
+    emitLeaderboardData();
+  }
+
+  socket.on('disconnect', () => {
+    liveNamespace.to(room).emit('message', 'A user has left the chat')
+    emitLeaderboardData();
+  });
+});
+
+app.post(
+  '/end_session',
+  errorHandler(async(req, res) => {
+    const { user, session } = req.body
+    const waitRoom = getWaitRoom(session);
+    const liveRoom = getLiveRoom(session);
+    // Verify that the given id is from the room owner
+    if (!(session in live_sessions)) {
+      throw new InputError("Unknown session name")
+    }
+
+    if (fakeDB[session].users[0] !== user) {
+      throw new AccessError("Only the owner of the session can end the session")
+    }
+
+    // Indicate that clients should change to new connection 
+    waitNamespace.to(liveRoom).emit("end-session")
+    //delete live_sessions[session]
+
+    // Close all connections related to the room
+    waitNamespace.in(liveRoom).disconnectSockets()
+
+    res.json({success: true})
+  })
+)
 
 app.post(
   '/echo',
@@ -72,6 +266,6 @@ app.use((req, res) => {
 
 // Route Handlers End here
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
