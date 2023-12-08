@@ -2,7 +2,7 @@ import { TextInput, Button, Group, Box, PasswordInput } from '@mantine/core';
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from '@mantine/form';
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function LoginPage() {
   const [visible, { toggle }] = useDisclosure(false);
@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     if (localStorage.getItem('token')) {
-      navigate('/');
+      navigate(-1);
     }
   }, [])
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
       alert(data.error);
     } else if (data.token) {
       localStorage.setItem('token', data.token);
-      navigate('/');
+      navigate(-1);
     }
   }
 
@@ -64,9 +64,12 @@ export default function LoginPage() {
         </Button>
         <Button
           variant="contained"
-          onClick={() => navigate('/')}>
+          onClick={() => navigate(-1)}>
           Cancel
         </Button>
+        <Link to="/register">
+          Haven't created an account yet? Sign up!
+        </Link>
       </Group>
     </Box>
   );
