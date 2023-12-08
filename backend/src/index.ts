@@ -5,6 +5,7 @@ import {
   echoFunction,
   echoRetrieveFunction
 } from './service'
+import { error } from 'console';
 
 const PORT = 6969;
 
@@ -37,6 +38,15 @@ const errorHandler = (fn: (req: Request, res: Response, next: NextFunction) => P
 app.get('/', (req, res) => {
     res.json('New Hello World!');
 });
+
+// Router to obtain the drinks upon adding
+app.post(
+  '/modal', 
+  errorHandler(async (req, res) => {
+    const { user } = req.body;
+    
+  }),
+);
 
 app.post(
   '/echo',
