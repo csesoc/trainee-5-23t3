@@ -4,7 +4,9 @@ import cors from 'cors';
 import { InputError, AccessError } from './error';
 import {
   echoFunction,
-  echoRetrieveFunction
+  echoRetrieveFunction,
+  login,
+  register
 } from './service'
 import { createServer } from 'http';
 
@@ -47,6 +49,26 @@ app.get('/', (req, res) => {
     res.json('Hello World!');
 });
 
+/* -------------------------------------------------------------------------- */
+/*                               Auth                                         */
+/* -------------------------------------------------------------------------- */
+app.post(
+  '/auth/login',
+  errorHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const token = await login(email, password);
+    res.json(token);
+  }),
+);
+
+app.post(
+  '/auth/register',
+  errorHandler(async (req, res) => {
+    const { email, password, name } = req.body;
+    const token = await register(email, password, name);
+    res.json(token);
+  }),
+);
 
 /* -------------------------------------------------------------------------- */
 /*                          Waiting Sessions                                  */
