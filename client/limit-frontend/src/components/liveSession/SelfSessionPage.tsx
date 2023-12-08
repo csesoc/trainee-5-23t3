@@ -1,10 +1,12 @@
-const SelfSessionPage: React.FC<{userData: any}> = (props) => {
+import { Button } from "@mantine/core";
 
+const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) => {
   return (
     <>
         <h3>
             Self Session Page
         </h3>
+        <Button onClick={() => props.emitData("Hello Data")}>Hello World</Button>
     </>
   );
 }
