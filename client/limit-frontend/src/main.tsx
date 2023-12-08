@@ -11,6 +11,8 @@ import HomePage from './routes/HomePage';
 import EchoPage from './routes/examples/EchoPage';
 import { MantineProvider } from '@mantine/core';
 import { theme } from './theme';
+import LoginPage from './routes/auth/LoginPage';
+import RegisterPage from './routes/auth/RegisterPage';
 import JoinedSessionPage from './routes/sessions/JoinedSessionPage';
 import StartSessionButton from './components/CreateSessionButton';
 import LiveSessionController from './routes/sessions/LiveSessionController';
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: "echo",
         element: <EchoPage/>
+      },
+      {
+        path: "register",
+        element: <RegisterPage />
+      },
+      {
+        path: "login",
+        element: <LoginPage />
       },
       {
         path: "join",
