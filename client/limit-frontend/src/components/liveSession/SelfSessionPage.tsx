@@ -1,17 +1,71 @@
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Modal, Autocomplete } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import Wine from "../../images/wine.jpg"
-// import Add from "../../images/add.png"
+import Add from "../../images/add.png"
+import Star from "../../images/star.png"
+import Remove from "../../images/remove.png"
+
+interface Item {
+  id: number;
+  name: string;
+}
+
+interface FavouriteItem extends Item {
+  isFavorite: boolean;
+}
 
 const SelfSessionPage: React.FC<{userData: any}> = (props) => {
-  const [opened, { open, close }] = useDisclosure(false)
+  // const [opened, { open, close }] = useDisclosure(false)
 
-  // const drinks = ['Beer', 'Wine', 'Soju', 'Sake', 'Whisky', 'Vodka', 'O.J >:D', 'Tequila', 'Absinthe', 'Spirytus']
+  const [items, setItems] = useState<Item[]>([
+    { id: 1, name: 'Beer (3 stds)' },
+    { id: 2, name: 'Wine (3 stds)' },
+    { id: 3, name: 'Soju (3 stds)' },
+    { id: 4, name: 'Sake (3 stds)' },
+    { id: 5, name: 'Whisky (2 stds)' },
+    { id: 6, name: 'Vodka (2 stds)' },
+    { id: 7, name: 'O.J >:D (2 stds)' },
+    { id: 8, name: 'Tequila (1 std)' },
+    { id: 9, name: 'Absinthe (1 std)' },
+    { id: 10, name: 'Spirytus (1 std)' }
+  ]);
 
-  // const content = Array(10)
-  //   .fill(0)
-  //   .map((_, index) => <p key={index}>{drinks}</p> )
+  const [favourites, setFavourites] = useState<FavouriteItem[]>([])
+
+  const [searchTerm, setSearchTerm] = useState<string>('')
+
+  const [firstModalOpen, setFirstModalOpen] = useState(false)
+
+  const [secondModalOpen, setSecondModalOpen] = useState(false)
+
+  const openFirstModal = () => setFirstModalOpen(true)
+  const closeFirstModal = () => setFirstModalOpen(false)
+
+  const openSecondModal = () => {
+    closeFirstModal() // closes the first modal before opening the second
+    setSecondModalOpen(true)
+  }
+
+  const closeSecondModal = () => setSecondModalOpen(false)
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleAddToFavourite = (item: Item) => {
+    const favoriteItem: FavouriteItem = { ...item, isFavorite: true };
+    setFavourites([...favourites, favoriteItem]);
+  };
+
+  const handleRemoveFromFavourite = (itemId: number) => {
+    setFavourites(favourites.filter((item) => item.id !== itemId))
+  }
+
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <>
@@ -23,28 +77,125 @@ const SelfSessionPage: React.FC<{userData: any}> = (props) => {
         height:"20%"
       }}/>
 
-    <Modal opened={opened} onClose={close} title='Pick your Poison'>
-    <Autocomplete
-      label="Drinks"
-      placeholder="Pick your poison"
-      data={['Beer', 'Wine', 'Soju', 'Sake', 'Whisky', 'Vodka', 'O.J >:D', 'Tequila', 'Absinthe', 'Spirytus']}
+    <button 
       style={{
-        paddingBottom:'1.5vw'
-      }}
+        width: "50px",
+        height: "50px",
+        background: "none",
+        padding: 0,
+        border: "none"
+      }}><img src={Add} onClick={openFirstModal} 
+        style={{
+          position: "absolute",
+          width: "5%",
+          height: "10%",
+          marginLeft: "-9vw",
+          marginTop:"-4vw"
+      }} />
+    </button>
+
+    <Modal opened={firstModalOpen} onClose={closeFirstModal} title='Pick and Add your Poison :))'>
+    <input
+        type="text"
+        value={searchTerm}
+        onChange={handleSearchChange}
+        placeholder="Search Drinks"
+        style={{
+          marginInline: "7.5vw"
+        }}
       />
+      
+        {filteredItems.map((item) => (
+          <p key={item.id}>
+            <button style={{
+              marginLeft:"25%",
+              fontSize: "2vw",
+              backgroundColor: "yellowgreen",
+              fontFamily: "Trebuchet MS, sans-serif",
+            }}>{item.name}</button>
+            <button onClick={() => handleAddToFavourite(item)} style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              fontSize: "2vw"
+            }}><img src={Star} alt='⭐' style={{
+              marginLeft: '1vw',
+              height: '2vw',
+              width: '2vw',
+              background: "none",
+              border: "none",
+              padding: 0,
+            }}/></button>
+          </p>
+        ))}
+        
       <Button
         size="xl"
         variant="filled"
         color="red"
         style={{
-          marginLeft: '35%'
+          marginLeft: "35%"
         }}
         >
           Add
       </Button>
     </Modal>
-    <Button onClick={open}>+</Button>
 
+     {/* For the favourites */}
+     <Modal opened={secondModalOpen} onClose={closeSecondModal} title='Favourites'>
+      {favourites.map((item) => (
+        <p key={item.id}>
+          <button style={{
+            marginLeft:"25%",
+            fontSize: "2vw",
+            backgroundColor: "yellow",
+            fontFamily: "Trebuchet MS, sans-serif"
+          }}>{item.name}</button>
+          <button onClick={() => handleRemoveFromFavourite(item.id)} style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            fontSize: "2vw"
+          }}>
+          <img src={Remove} alt='❌' style={{
+            marginLeft: '1vw',
+            height: '2vw',
+            width: '2vw',
+            background: "none",
+            border: "none",
+            padding: 0,
+          }}/>
+        </button>
+      </p>
+      ))}
+      <Button
+        size="xl"
+        variant="filled"
+        color="red"
+        style={{
+          marginLeft: "35%"
+        }}
+        >
+          Add
+      </Button>
+    </Modal>
+    <button 
+      style={{
+       width: "50px",
+       height: "50px",
+       background: "none",
+       padding: 0,
+       border: "none"
+      }}><img src={Star} onClick={openSecondModal} 
+        style={{
+          position: "absolute",
+          width: "5%",
+          height: "10%",
+          top: "5vw",
+          right: "1vw"
+      }} />
+    </button>
+    
     <Link to="/reflection">
     <Button 
       size="xl"
@@ -52,7 +203,9 @@ const SelfSessionPage: React.FC<{userData: any}> = (props) => {
       gradient={{ from: "#E1341E", to: "#E75D4B", deg: 90}}
       style={{
           fontSize: "3vw",
-          marginLeft: "40vw"
+          position: "absolute",
+          bottom: '1vw',
+          right: '1vw'
         }}>
       LEAVE
     </Button>
