@@ -16,7 +16,7 @@ interface FavouriteItem extends Item {
   isFavorite: boolean;
 }
 
-const SelfSessionPage: React.FC<{userData: any}> = (props) => {
+const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) => {
   // const [opened, { open, close }] = useDisclosure(false)
 
   const [items, setItems] = useState<Item[]>([
@@ -101,31 +101,32 @@ const SelfSessionPage: React.FC<{userData: any}> = (props) => {
         onChange={handleSearchChange}
         placeholder="Search Drinks"
         style={{
-          marginInline: "7.5vw"
+          marginInline: "25%"
         }}
       />
       
         {filteredItems.map((item) => (
           <p key={item.id}>
-            <button style={{
-              marginLeft:"25%",
-              fontSize: "2vw",
+            <Button onClick={() => props.emitData(`${item.name} has been added`)} 
+            style={{
+              marginLeft:"20%",
+              fontSize: "1.5vw",
               backgroundColor: "yellowgreen",
               fontFamily: "Trebuchet MS, sans-serif",
-            }}>{item.name}</button>
-            <button onClick={() => handleAddToFavourite(item)} style={{
+            }}>{item.name}</Button>
+            <Button onClick={() => handleAddToFavourite(item)} style={{
               background: "none",
               border: "none",
               padding: 0,
-              fontSize: "2vw"
+              fontSize: "1.5vw"
             }}><img src={Star} alt='⭐' style={{
-              marginLeft: '1vw',
+              marginLeft: '0.5vw',
               height: '2vw',
               width: '2vw',
               background: "none",
               border: "none",
               padding: 0,
-            }}/></button>
+            }}/></Button>
           </p>
         ))}
         
@@ -145,27 +146,29 @@ const SelfSessionPage: React.FC<{userData: any}> = (props) => {
      <Modal opened={secondModalOpen} onClose={closeSecondModal} title='Favourites'>
       {favourites.map((item) => (
         <p key={item.id}>
-          <button style={{
-            marginLeft:"25%",
-            fontSize: "2vw",
+          <Button onClick={() => props.emitData(`${item.name} has been added`)} 
+          style={{
+            marginLeft:"20%",
+            fontSize: "1.5vw",
             backgroundColor: "yellow",
+            color: "black",
             fontFamily: "Trebuchet MS, sans-serif"
-          }}>{item.name}</button>
-          <button onClick={() => handleRemoveFromFavourite(item.id)} style={{
+          }}>{item.name}</Button>
+          <Button onClick={() => handleRemoveFromFavourite(item.id)} style={{
             background: "none",
             border: "none",
             padding: 0,
-            fontSize: "2vw"
+            fontSize: "1.5vw"
           }}>
           <img src={Remove} alt='❌' style={{
-            marginLeft: '1vw',
+            marginLeft: '0.5vw',
             height: '2vw',
             width: '2vw',
             background: "none",
             border: "none",
             padding: 0,
           }}/>
-        </button>
+        </Button>
       </p>
       ))}
       <Button

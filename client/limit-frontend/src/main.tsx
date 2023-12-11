@@ -43,14 +43,6 @@ const router = createBrowserRouter([
         element: <EchoPage/>
       },
       {
-        path: "mode",
-        element: <ModePage/>
-      },
-      {
-        path: "start",
-        element: <SessionStart/>
-      },
-      {
         path: "reflection",
         element: <ReflectionPage/>
       },
