@@ -1,8 +1,10 @@
 import { PasswordInput } from "@mantine/core";
+import DrunkMeter from "../components/DrunkMeter";
 
 export default function HomePage() {
   return (
     <>
+      <DrunkMeter progress={10}/>
       <PasswordInput
         placeholder="Password"
         label="Password"

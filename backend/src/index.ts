@@ -213,6 +213,11 @@ liveNamespace.on('connection', (socket) => {
     emitLeaderboardData();
   }
 
+  socket.on('data', (data:any) => {
+    // Assume that any data recieved on data will be adding a drink
+    console.log(data)
+  })
+
   socket.on('disconnect', () => {
     liveNamespace.to(room).emit('message', 'A user has left the chat')
     emitLeaderboardData();
