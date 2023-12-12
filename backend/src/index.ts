@@ -177,7 +177,21 @@ app.post(
   })
 )
 
+/* -------------------------------------------------------------------------- */
+/*                            Drink selection                                 */
+/* -------------------------------------------------------------------------- */
 
+app.post(
+  '/modal',
+  errorHandler(async(req, res) => {
+    const { user, session } = req.body
+
+    const existingUser = fakeDB[session].users.find((findUser: any) => findUser == user );
+    if (!existingUser) throw new AccessError("Only existing users can add and select drinks");
+
+    res.json({success: true});
+  })
+)
 
 /* -------------------------------------------------------------------------- */
 /*                             Live Sessions                                  */
