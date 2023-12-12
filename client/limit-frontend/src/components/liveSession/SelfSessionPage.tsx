@@ -79,6 +79,7 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
     );
   };
 
+
   return (
     <>
     <img 
