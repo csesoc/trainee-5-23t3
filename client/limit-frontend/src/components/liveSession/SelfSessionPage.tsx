@@ -4,12 +4,14 @@ import { Button, Modal, Autocomplete } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import Wine from "../../images/wine.jpg"
 import Add from "../../images/add.png"
+import StarOutline from "../../images/staroutline.png"
 import Star from "../../images/star.png"
 import Remove from "../../images/remove.png"
 
 interface Item {
   id: number;
   name: string;
+  selected: boolean;
 }
 
 interface FavouriteItem extends Item {
@@ -17,19 +19,17 @@ interface FavouriteItem extends Item {
 }
 
 const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) => {
-  // const [opened, { open, close }] = useDisclosure(false)
-
   const [items, setItems] = useState<Item[]>([
-    { id: 1, name: 'Beer (3 stds)' },
-    { id: 2, name: 'Wine (3 stds)' },
-    { id: 3, name: 'Soju (3 stds)' },
-    { id: 4, name: 'Sake (3 stds)' },
-    { id: 5, name: 'Whisky (2 stds)' },
-    { id: 6, name: 'Vodka (2 stds)' },
-    { id: 7, name: 'O.J >:D (2 stds)' },
-    { id: 8, name: 'Tequila (1 std)' },
-    { id: 9, name: 'Absinthe (1 std)' },
-    { id: 10, name: 'Spirytus (1 std)' }
+    { id: 1, name: 'Beer (3 stds)', selected: true },
+    { id: 2, name: 'Wine (3 stds)', selected: true },
+    { id: 3, name: 'Soju (3 stds)', selected: true },
+    { id: 4, name: 'Sake (3 stds)', selected: true },
+    { id: 5, name: 'Whisky (2 stds)', selected: true },
+    { id: 6, name: 'Vodka (2 stds)', selected: true },
+    { id: 7, name: 'O.J >:D (2 stds)', selected: true },
+    { id: 8, name: 'Tequila (1 std)', selected: true },
+    { id: 9, name: 'Absinthe (1 std)', selected: true },
+    { id: 10, name: 'Spirytus (1 std)', selected: true }
   ]);
 
   const [favourites, setFavourites] = useState<FavouriteItem[]>([])
@@ -57,15 +57,27 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
   const handleAddToFavourite = (item: Item) => {
     const favoriteItem: FavouriteItem = { ...item, isFavorite: true };
     setFavourites([...favourites, favoriteItem]);
+    handleItemClick(item.id);
   };
 
   const handleRemoveFromFavourite = (itemId: number) => {
     setFavourites(favourites.filter((item) => item.id !== itemId))
+    handleItemClick(itemId);
   }
 
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // const [isStarFill, setIsStarFill] = useState(true);
+
+  const handleItemClick = (id: number) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, selected: !item.selected } : item
+      )
+    );
+  };
 
   return (
     <>
@@ -73,8 +85,8 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
       src={Wine} 
       alt="wine"
       style={{
-        width:"20%",
-        height:"20%"
+        width:"33%",
+        height:"33%"
       }}/>
 
     <button 
@@ -87,10 +99,10 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
       }}><img src={Add} onClick={openFirstModal} 
         style={{
           position: "absolute",
-          width: "5%",
-          height: "10%",
-          marginLeft: "-9vw",
-          marginTop:"-4vw"
+          width: "7.5%",
+          height: "15%",
+          marginLeft: "-13.5vw",
+          marginTop:"-6.5vw"
       }} />
     </button>
 
@@ -109,18 +121,21 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
           <p key={item.id}>
             <Button onClick={() => props.emitData(`${item.name} has been added`)} 
             style={{
-              marginLeft:"20%",
+              marginLeft:"15%",
               fontSize: "1.5vw",
               backgroundColor: "yellowgreen",
               fontFamily: "Trebuchet MS, sans-serif",
+              alignContent: "flex-start",
             }}>{item.name}</Button>
             <Button onClick={() => handleAddToFavourite(item)} style={{
               background: "none",
               border: "none",
               padding: 0,
-              fontSize: "1.5vw"
-            }}><img src={Star} alt='⭐' style={{
-              marginLeft: '0.5vw',
+              fontSize: "1.5vw",
+              right: "2vw",
+              position: "fixed"
+            }}><img src={item.selected ? StarOutline: Star} alt='⭐' style={{
+              alignContent: 'flex-end',
               height: '2vw',
               width: '2vw',
               background: "none",
@@ -158,9 +173,11 @@ const SelfSessionPage: React.FC<{userData: any, emitData: Function}> = (props) =
             background: "none",
             border: "none",
             padding: 0,
-            fontSize: "1.5vw"
+            fontSize: "1.5vw",
+            right: "2vw",
+            position: "fixed"
           }}>
-          <img src={Remove} alt='❌' style={{
+          <img src={item.selected ? Remove: Star} alt='❌' style={{
             marginLeft: '0.5vw',
             height: '2vw',
             width: '2vw',
