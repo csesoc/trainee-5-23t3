@@ -138,4 +138,128 @@ const register = async(email:string, password:string, name:string) => {
     }
 }
 
-export { echoFunction, echoRetrieveFunction, login, register };
+const createSession = async(session: string, users: string[]) => {
+    const participants = [];
+    for (const uId of users) {
+        participants.push({id: uId});
+    }
+
+    const Info = [];
+    for (const uId of users) {
+        Info.push({
+            participant: {
+                connect: {
+                    id: uId
+                }
+            },
+            session: null,
+            drinks: []
+        });
+    }
+
+    const create = await prisma.session.create({
+        data: {
+            name: session,
+            participants: {
+                connect: participants
+            }
+        }
+    }).catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
+
+    const sessionId = create.id;
+    if (sessionId === null) {
+        throw new Error('Session is not created successfully...');
+    }
+
+    for (const uId of users) {
+        await prisma.sessionInfo.create({
+            data: {
+                participant: {
+                    connect: {
+                        id: uId
+                    }
+                },
+                session: {
+                    connect: {
+                        id: sessionId
+                    }
+                }
+            },
+            include: {
+                participant: true,
+                session: true
+            }
+        }
+        ).catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    }
+
+    await prisma.$disconnect();
+    return { sessionId };
+    // await prisma.session.update({
+    //     where: {
+    //       id: sessionId,
+    //     },
+    //     data: {
+    //         sessionInfo: {
+    //             createMany: 
+    //         }
+    //     }
+    // }).then(async () => {
+    //     await prisma.$disconnect()
+    // }).catch(async (e) => {
+    //     console.error(e)
+    //     await prisma.$disconnect()
+    //     process.exit(1)
+    // })
+}
+
+const checkSession = async(session: string) => {
+    let leadboardInfo: any = {};
+
+    const info = await prisma.session.findMany({
+        select: {
+            sessionInfo: {
+                select: {
+                    participant: {
+                        select: { name: true }
+                    },
+                    drinks: true
+                }
+            }
+        }, 
+        where: {
+            id: {
+                equals: session
+            }
+        }
+    }).catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
+
+    if (info === null) {
+        throw new Error('Info is not retrived successfully...');
+    } else if (info.length !== 1) {
+        throw new Error('Info is not retrived properly...');
+    }
+
+    for (const i of info[0].sessionInfo) {
+        const uName = i.participant.name;
+        let score = 0;
+        i.drinks.forEach(d => score += d.dRate);
+        leadboardInfo[uName] = score;
+    }
+
+    return { leadboardInfo };
+}
+
+export { echoFunction, echoRetrieveFunction, getUserIdFromToken, login, register, createSession, checkSession };

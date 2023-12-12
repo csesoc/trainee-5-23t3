@@ -5,8 +5,11 @@ import { InputError, AccessError } from './error';
 import {
   echoFunction,
   echoRetrieveFunction,
+  getUserIdFromToken,
   login,
-  register
+  register,
+  createSession,
+  checkSession
 } from './service'
 import { createServer } from 'http';
 
@@ -133,18 +136,25 @@ waitNamespace.on('connection', (socket) => {
 app.post(
   '/create_session',
   errorHandler(async(req, res) => {
+    // const { uId } = req.body;
+    const token = req.header('Authorization');
+
+    if (!token) {
+      throw new AccessError('Invalid token');
+    }
+    const user = getUserIdFromToken(token);
+
     // const response = await createSessionFunction(userID)
     let new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
     while (new_session_id in live_sessions) {
       new_session_id = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
     }
     // Create the database and store the mapping 
-    // TODO change right side for database id
     live_sessions[new_session_id] = {
       dbId: null,
       live: false
     };
-    fakeDB[new_session_id] = {users: []}
+    fakeDB[new_session_id] = {users: [user]}
 
     res.json({id: new_session_id})
   })
@@ -153,9 +163,17 @@ app.post(
 app.post(
   '/start_session',
   errorHandler(async(req, res) => {
-    const { user, session } = req.body
+    const token = req.header('Authorization');
+    // const { user, session } = req.body
+    const { session } = req.body
     const room = getWaitRoom(session)
     // Verify that the given id is from the room owner
+
+    if (!token) {
+      throw new AccessError('Invalid token');
+    }
+    const user = getUserIdFromToken(token);
+
     if (!(session in live_sessions)) {
       throw new InputError("Unknown session name")
     }
@@ -164,9 +182,11 @@ app.post(
       throw new AccessError("Only the owner of the session can start the session")
     }
 
-    // TODO: Create new session and assign db Id to dbId
-    live_sessions[session].dbId = null;
-  
+    // TODO: Create new session
+    const { sessionId } = await createSession(session, fakeDB[session].users);
+
+    // Assign db Id to dbId
+    live_sessions[session].dbId = sessionId;
     live_sessions[session].live = true;
 
     // Indicate that clients should change to new connection 
@@ -197,9 +217,11 @@ liveNamespace.on('connection', (socket) => {
   const session: string = socket.handshake.query.session as string;
   const room = getLiveRoom(session)
 
-  const emitLeaderboardData = () => {
+  const emitLeaderboardData = async () => {
     // retrive session data from db
-    // liveNamespace.to(room).emit('data', some data struc)
+    // ------------------ not sure if session is the db session id --------------------
+    const info = await checkSession(session);
+    liveNamespace.to(room).emit('data', {info: info.leadboardInfo})
   }
 
   // Close the connection if there is no matching session in the database
