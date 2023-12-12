@@ -262,4 +262,49 @@ const checkSession = async(session: string) => {
     return { leadboardInfo };
 }
 
-export { echoFunction, echoRetrieveFunction, getUserIdFromToken, login, register, createSession, checkSession };
+const addShot = async(user: string, session: string, drink: string, dRate: number) => {
+    const infoId = await prisma.sessionInfo.findFirst({
+        select: {
+            id: true
+        }, 
+        where: {
+            participantID: {
+                equals: user
+            },
+            sessionId: {
+                equals: session
+            }
+        }
+    }).catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
+
+    if (infoId === null) {
+        throw new Error('Info is not retrived successfully...');
+    }
+
+    const info = await prisma.shot.create({
+        data: {
+            user: {
+                connect: { id: user }
+            }, 
+            session: {
+                connect: infoId 
+            }, 
+            drink,
+            dRate
+        },
+        include: {
+            user: true,
+            session: true
+        }
+    }).catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
+}
+
+export { echoFunction, echoRetrieveFunction, getUserIdFromToken, login, register, createSession, checkSession, addShot };

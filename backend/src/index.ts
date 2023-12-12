@@ -9,7 +9,8 @@ import {
   login,
   register,
   createSession,
-  checkSession
+  checkSession,
+  addShot
 } from './service'
 import { createServer } from 'http';
 
@@ -249,9 +250,10 @@ liveNamespace.on('connection', (socket) => {
     emitLeaderboardData();
   }
 
-  socket.on('data', (data:any) => {
-    // Assume that any data recieved on data will be adding a drink
-    console.log(data)
+  socket.on('data', async (data:any) => {
+    const { uId, sessionId, drinkName, dRate } = data;
+    await addShot(uId, sessionId, drinkName, dRate);
+    // console.log(data)
   })
 
   socket.on('disconnect', () => {
