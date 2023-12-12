@@ -1,89 +1,59 @@
-import { TextInput, Button, Group, Box, PasswordInput } from '@mantine/core';
-import { useDisclosure } from "@mantine/hooks";
-import { useForm } from '@mantine/form';
-import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { PasswordInput, TextInput } from "@mantine/core";
+import React, { useState } from 'react';
+import ButtonComponent from '../ButtonComponent';
+import styled from 'styled-components';
 
-export default function RegisterPage() {
-  const [visible, { toggle }] = useDisclosure(false);
-  const navigate = useNavigate();
+const BackgroundContainer = styled.div`
+  background: url('./Register_Background.png') no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  height: 60vw; /* Adjust the height as needed */
+  padding-left: 4vw;
+`;
 
-  React.useEffect(() => {
-    if (localStorage.getItem('token')) {
-      navigate(-2);
-    }
-  }, [])
+const RegistrationWrapper = styled.div`
+    position: absolute;
+    background-color: white;
+    top: 35%;
+    width: 30vw;
+    height: 32vw;
+    padding: 2vw;
+    box-shadow: 8px 8px 8px red, -8px -8px 8px red, 8px -8px 8px red, -8px 8px 8px red;
+`
 
-  const form = useForm({
-    initialValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-  });
+export default function HomePage() {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
 
-  const register = async () => {
-    const { name, email, password, confirmPassword } = form.values;
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      throw new Error('Passwords do not match');
-    } else {
-      const res = await fetch('http://localhost:6969/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({
-          email, password, name
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-      } else if (data.token) {
-        localStorage.setItem('token', data.token);
-        navigate(-2);
-      }
-    }
-  }
-
-  return (
-    <Box maw={340} mx="auto">
-      <TextInput mt="md" label="Name" placeholder="Name" {...form.getInputProps('name')} />
-      <TextInput mt="md" label="Email" placeholder="Email" {...form.getInputProps('email')} />
-
-      <PasswordInput
-        mt="md"
-        label="Password"
-        placeholder="Password"
-        visible={visible}
-        onVisibilityChange={toggle}
-        {...form.getInputProps('password')}
-      />
-      <PasswordInput
-      
-        label="Confirm password"
-        placeholder="Confirm password"
-        visible={visible}
-        onVisibilityChange={toggle}
-        {...form.getInputProps('confirmPassword')}
-      />
-
-      <Group justify="center" mt="xl">
-        <Button
-          variant="contained"
-          onClick={register}>
-          Register
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => navigate(-2)}>
-          Cancel
-        </Button>
-      </Group>
-    </Box>
-  );
+    return (
+        <BackgroundContainer>
+        
+        <RegistrationWrapper>
+        <h1 style={{textAlign: "center"}}> Register </h1>
+        <TextInput
+            label="Username"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(event) => setUsername(event.currentTarget.value)}
+        />
+        <TextInput
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(event) => setEmail(event.currentTarget.value)}
+        />
+        <PasswordInput
+            placeholder="Password"
+            label="Password"
+            description="Password must include at least one letter, number and special character"
+            radius="md"
+            required
+        />
+        <ButtonComponent buttonText="Sip" buttonURL="/home" xPos={2} yPos={0} width={26} height={5}/>
+        </RegistrationWrapper>
+        </BackgroundContainer>
+    );
 }

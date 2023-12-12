@@ -8,6 +8,7 @@ import {
 import ErrorPage from './routes/ErrorPage';
 import ExamplePage from './routes/examples/ExamplePage';
 import HomePage from './routes/HomePage';
+import UserHome from './routes/UserHome';
 import EchoPage from './routes/examples/EchoPage';
 import ReflectionPage from './routes/ReflectionPage';
 import GoodbyePage from './routes/GoodbyePage';
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "live/:session",
         element: <LiveSessionController/>,
+      },
+      {
+        path: "home",
+        element: <UserHome/>,
       },
     ]
   },
