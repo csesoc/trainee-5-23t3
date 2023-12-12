@@ -75,7 +75,7 @@ app.post(
 /* -------------------------------------------------------------------------- */
 
 type LiveMapping = {
-  dbId: string,
+  dbId: string | null,
   live: boolean
 }
 
@@ -141,7 +141,7 @@ app.post(
     // Create the database and store the mapping 
     // TODO change right side for database id
     live_sessions[new_session_id] = {
-      dbId: new_session_id,
+      dbId: null,
       live: false
     };
     fakeDB[new_session_id] = {users: []}
@@ -164,11 +164,13 @@ app.post(
       throw new AccessError("Only the owner of the session can start the session")
     }
 
+    // TODO: Create new session and assign db Id to dbId
+    live_sessions[session].dbId = null;
+  
     live_sessions[session].live = true;
 
     // Indicate that clients should change to new connection 
     waitNamespace.to(room).emit("start-session")
-    //delete live_sessions[session]
 
     // Close all connections related to the room
     waitNamespace.in(room).disconnectSockets()
@@ -197,7 +199,7 @@ liveNamespace.on('connection', (socket) => {
 
   const emitLeaderboardData = () => {
     // retrive session data from db
-    // liveNamespace.to(room).emit('data', some data structure)
+    // liveNamespace.to(room).emit('data', some data struc)
   }
 
   // Close the connection if there is no matching session in the database
