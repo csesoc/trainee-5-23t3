@@ -1,5 +1,5 @@
 import { PasswordInput } from "@mantine/core";
-import DrunkMeter from "../components/drunkMeter";
+import DrunkMeter from "../components/DrunkMeter";
 
 export default function HomePage() {
   return (

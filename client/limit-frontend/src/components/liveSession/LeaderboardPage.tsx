@@ -1,4 +1,4 @@
-import DrunkMeter from "../drunkMeter";
+import DrunkMeter from "../DrunkMeter";
 
 const LeaderboardPage: React.FC<{userDataList: any}> = (props) => {
 
