@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-import { PasswordInput } from "@mantine/core";
-import DrunkMeter from "../components/DrunkMeter";
-=======
 import React from 'react';
 import ButtonComponent from './ButtonComponent';
 import styled from 'styled-components';
->>>>>>> main
 
 // Define a type for the Title component props
 interface TitleProps {
