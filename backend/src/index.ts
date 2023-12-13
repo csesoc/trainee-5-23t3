@@ -251,6 +251,7 @@ liveNamespace.on('connection', (socket) => {
   }
 
   socket.on('data', async (data:any) => {
+    // Not sure about type of data...
     const { uId, sessionId, drinkName, dRate } = data;
     await addShot(uId, sessionId, drinkName, dRate);
     // console.log(data)
